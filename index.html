@@ -3,89 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Pagos - Jimmy</title>
+    <title>Gestor de Pagos Jimmy</title>
     <style>
         :root {
             --primary: #2c3e50;
             --accent: #27ae60;
-            --bg: #f4f7f6;
+            --warning: #e67e22;
+            --danger: #e74c3c;
+            --bg: #f0f3f5;
         }
-        body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { color: var(--primary); text-align: center; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         
-        .pago-item {
+        .header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-nav { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
+        
+        h2 { margin: 0; color: var(--primary); font-size: 1.4em; }
+
+        .pago-card {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: 12px;
             border-bottom: 1px solid #eee;
-        }
-        .pago-info { display: flex; flex-direction: column; }
-        .pago-nombre { font-weight: bold; color: #333; }
-        .pago-fecha { font-size: 0.85em; color: #7f8c8d; }
-        
-        .monto-input { width: 80px; padding: 5px; border: 1px solid #ddd; border-radius: 5px; text-align: right; }
-        
-        .btn-check {
-            background: #ddd;
-            border: none;
-            padding: 10px;
-            border-radius: 50%;
-            cursor: pointer;
             transition: 0.3s;
         }
-        .btn-check.pagado { background: var(--accent); color: white; }
+        .pago-card.vencido { border-left: 5px solid var(--danger); background: #fff5f5; }
         
-        .total-box {
+        .info { flex-grow: 1; margin-left: 10px; }
+        .nombre { font-weight: bold; display: block; color: #333; }
+        .detalle { font-size: 0.75em; color: #666; }
+
+        .monto-input { 
+            width: 90px; 
+            padding: 8px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            text-align: right;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .btn-check {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            background: white;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+        .btn-check.pagado {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .resumen {
             margin-top: 20px;
             padding: 15px;
             background: var(--primary);
             color: white;
             border-radius: 10px;
-            text-align: center;
-            font-size: 1.2em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Mis Pagos - Abril 2026</h2>
-    
-    <div id="lista-pagos">
-        <div class="pago-item">
-            <div class="pago-info">
-                <span class="pago-nombre">GAS</span>
-                <span class="pago-fecha">Vence: 26 de cada mes</span>
-            </div>
-            <input type="number" class="monto-input" value="45.00">
-            <button class="btn-check" onclick="this.classList.toggle('pagado')">✓</button>
-        </div>
-
-        <div class="pago-item">
-            <div class="pago-info">
-                <span class="pago-nombre">LUZ (378539)</span>
-                <span class="pago-fecha">Vence: 19-20</span>
-            </div>
-            <input type="number" class="monto-input" value="83.30">
-            <button class="btn-check" onclick="this.classList.toggle('pagado')">✓</button>
-        </div>
-
-        <div class="pago-item">
-            <div class="pago-info">
-                <span class="pago-nombre">Internet</span>
-                <span class="pago-fecha">Vence: 31</span>
-            </div>
-            <input type="number" class="monto-input" value="60.90">
-            <button class="btn-check" onclick="this.classList.toggle('pagado')">✓</button>
-        </div>
+    <div class="header-nav">
+        <button class="btn-nav" onclick="cambiarMes(-1)">◀</button>
+        <h2 id="mes-actual">ABRIL 2026</h2>
+        <button class="btn-nav" onclick="cambiarMes(1)">▶</button>
     </div>
 
-    <div class="total-box">
-        Total Pendiente: S/ <span id="total-monto">189.20</span>
+    <div id="lista-servicios">
+        </div>
+
+    <div class="resumen">
+        <span>Total Mensual:</span>
+        <strong id="total-monto">S/ 0.00</strong>
     </div>
 </div>
+
+<script>
+    // Lista de servicios basada en tus cuadernos
+    const serviciosBase = [
+        { nombre: "GAS", dia: 26, monto: 45.00, detalle: "Jueves" },
+        { nombre: "LUZ (378539)", dia: 19, monto: 83.30, detalle: "Promedio mensual" },
+        { nombre: "CEL JIMMY", dia: 22, monto: 34.95, detalle: "9830266**" },
+        { nombre: "FONDEZURCO", dia: 16, monto: 189.80, detalle: "Cuota fija" },
+        { nombre: "INTERNET", dia: 31, monto: 60.90, detalle: "Fin de mes" },
+        { nombre: "PRÉSTAMO", dia: 14, monto: 122.00, detalle: "Cuotas" },
+        { nombre: "ESTILOS", dia: 27, monto: 405.41, detalle: "Línea de crédito" },
+        { nombre: "COLEGIO", dia: 2, monto: 200.00, detalle: "Matrícula/Mensualidad" },
+        { nombre: "NETFLIX", dia: 28, monto: 15.00, detalle: "Streaming" }
+    ];
+
+    let fechaApp = new Date(2026, 3, 1); // Empezamos en Abril 2026
+
+    function renderizar() {
+        const contenedor = document.getElementById('lista-servicios');
+        const mesTxt = document.getElementById('mes-actual');
+        const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+        
+        mesTxt.innerText = `${meses[fechaApp.getMonth()]} ${fechaApp.getFullYear()}`;
+        contenedor.innerHTML = "";
+        let total = 0;
+
+        serviciosBase.forEach(s => {
+            total += s.monto;
+            const hoy = new Date().getDate();
+            const esVencido = (s.dia < hoy);
+
+            contenedor.innerHTML += `
+                <div class="pago-card ${esVencido ? 'vencido' : ''}">
+                    <div class="info">
+                        <span class="nombre">${s.nombre}</span>
+                        <span class="detalle">Día ${s.dia} - ${s.detalle}</span>
+                    </div>
+                    <input type="number" class="monto-input" value="${s.monto.toFixed(2)}">
+                    <button class="btn-check" onclick="togglePagado(this)">✓</button>
+                </div>
+            `;
+        });
+        document.getElementById('total-monto').innerText = `S/ ${total.toFixed(2)}`;
+        verificarNotificaciones();
+    }
+
+    function cambiarMes(dir) {
+        fechaApp.setMonth(fechaApp.getMonth() + dir);
+        renderizar();
+    }
+
+    function togglePagado(btn) {
+        btn.classList.toggle('pagado');
+    }
+
+    // Función para simular notificaciones antes del vencimiento
+    function verificarNotificaciones() {
+        const hoy = new Date().getDate();
+        serviciosBase.forEach(s => {
+            // Si faltan 2 días para el pago, avisar
+            if (s.dia - hoy <= 2 && s.dia - hoy > 0) {
+                console.log(`Recordatorio: Pagar ${s.nombre} en ${s.dia - hoy} días.`);
+                // Aquí se podría integrar una notificación real del navegador
+            }
+        });
+    }
+
+    renderizar();
+</script>
 
 </body>
 </html>
