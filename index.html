@@ -3,64 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Pagos Jimmy V2</title>
+    <title>Gestor de Pagos Jimmy - Pro</title>
     <style>
         :root {
             --primary: #2c3e50;
             --accent: #27ae60;
             --bg: #f8f9fa;
-            --text: #333;
+            --danger: #e74c3c;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; padding-bottom: 80px; }
         .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         
-        /* Header y Navegación */
         .header { text-align: center; margin-bottom: 20px; }
-        .nav-mes { display: flex; justify-content: space-between; align-items: center; background: #eee; border-radius: 10px; padding: 5px; }
+        .nav-mes { display: flex; justify-content: space-between; align-items: center; background: #eee; border-radius: 10px; padding: 8px; margin-bottom: 15px; }
         .btn-nav { border: none; background: var(--primary); color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
 
-        /* Tarjeta de Servicio */
-        .pago-card {
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .pago-card.pagado { opacity: 0.6; border-left: 5px solid var(--accent); }
+        /* Formulario para agregar */
+        .form-add { background: #f1f1f1; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed #ccc; }
+        .form-add input { width: 90%; margin: 5px 0; padding: 8px; border-radius: 5px; border: 1px solid #ddd; }
+        .btn-add { background: var(--accent); color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+
+        /* Tarjetas */
+        .pago-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px; margin-bottom: 12px; position: relative; transition: 0.3s; }
+        .pago-card.pagado { border-left: 6px solid var(--accent); background: #f0fff4; }
         .pago-header { display: flex; justify-content: space-between; align-items: center; }
         
-        .info-txt { display: flex; flex-direction: column; }
-        .nombre { font-weight: bold; font-size: 1.1em; }
-        .fecha-guia { font-size: 0.8em; color: #666; margin-top: 4px; }
+        .info-txt { flex: 1; }
+        .nombre { font-weight: bold; font-size: 1.1em; display: block; }
+        .fecha-guia { font-size: 0.8em; color: #666; }
+
+        .btn-group { display: flex; align-items: center; gap: 10px; }
+        .btn-check { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #ddd; background: white; cursor: pointer; font-size: 1.2em; }
+        .btn-check.activo { background: var(--accent); color: white; border-color: var(--accent); }
+        .btn-del { color: var(--danger); background: none; border: none; cursor: pointer; font-size: 0.9em; }
 
         /* Barra de Tiempo */
-        .progreso-container { background: #eee; height: 6px; border-radius: 3px; margin-top: 10px; overflow: hidden; }
-        .progreso-bar { height: 100%; background: var(--accent); transition: width 0.5s; }
-        .progreso-bar.urgente { background: #e74c3c; }
+        .progreso-container { background: #eee; height: 6px; border-radius: 3px; margin-top: 10px; }
+        .progreso-bar { height: 100%; background: var(--accent); border-radius: 3px; }
+        .progreso-bar.urgente { background: var(--danger); }
 
-        /* Botón Check */
-        .btn-check {
-            width: 45px; height: 45px; border-radius: 50%; border: 2px solid #ddd;
-            background: white; cursor: pointer; font-size: 1.2em; display: flex; align-items: center; justify-content: center;
-        }
-        .btn-check.activo { background: var(--accent); color: white; border-color: var(--accent); }
-
-        /* Resumen Final */
-        .resumen-footer {
-            margin-top: 20px; padding: 20px; background: var(--primary);
-            color: white; border-radius: 15px; text-align: center;
-        }
-        .mensaje-exito { display: none; background: #d4edda; color: #155724; padding: 15px; border-radius: 10px; margin-top: 10px; font-weight: bold; }
+        /* Footer */
+        .resumen-footer { margin-top: 20px; padding: 15px; background: var(--primary); color: white; border-radius: 15px; text-align: center; }
+        .mensaje-exito { display: none; background: #d4edda; color: #155724; padding: 15px; border-radius: 10px; margin-top: 10px; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h2>Mi Gestor de Pagos</h2>
+        <h2>Mi Gestor Jimmy</h2>
         <div class="nav-mes">
             <button class="btn-nav" onclick="cambiarMes(-1)">◀</button>
             <span id="label-mes" style="font-weight: bold;">ABRIL 2026</span>
@@ -68,56 +59,62 @@
         </div>
     </div>
 
+    <div class="form-add">
+        <strong>+ Agregar Nuevo Pago</strong>
+        <input type="text" id="new-nombre" placeholder="Nombre (Ej. Arbitrios)">
+        <input type="number" id="new-monto" placeholder="Monto S/">
+        <input type="number" id="new-dia" placeholder="Día de vencimiento (1-31)">
+        <button class="btn-add" onclick="agregarServicio()">Guardar en la lista</button>
+    </div>
+
     <div id="lista-servicios"></div>
 
     <div class="resumen-footer">
-        <div style="font-size: 0.9em; opacity: 0.8;">Total Restante por Pagar:</div>
+        <div style="font-size: 0.9em; opacity: 0.8;">Total Restante:</div>
         <div id="total-restante" style="font-size: 1.8em; font-weight: bold;">S/ 0.00</div>
     </div>
 
     <div id="mensaje-exito" class="mensaje-exito">
-        ¡Excelente Jimmy! Has cumplido con todos tus pagos de este mes. 🎯✅
+        ¡Todo pagado! Eres un crack de las finanzas. 🎯✅
     </div>
 </div>
 
 <script>
-    // Configuración de servicios con intervalos (frecuencia en días)
-    const servicios = [
-        { id: 1, nombre: "GAS", monto: 45.00, diaVence: 26, frecuencia: 30 },
-        { id: 2, nombre: "LUZ", monto: 83.30, diaVence: 19, frecuencia: 30 },
-        { id: 3, nombre: "CEL JIMMY", monto: 34.95, diaVence: 22, frecuencia: 30 },
-        { id: 4, nombre: "FONDEZURCO", monto: 189.80, diaVence: 16, frecuencia: 30 },
-        { id: 5, nombre: "INTERNET", monto: 60.90, diaVence: 31, frecuencia: 30 },
-        { id: 6, nombre: "ESTILOS", monto: 405.41, diaVence: 27, frecuencia: 30 },
-        { id: 7, nombre: "PRÉSTAMO", monto: 122.00, diaVence: 14, frecuencia: 15 }, // Ejemplo quincenal
-        { id: 8, nombre: "NETFLIX", monto: 15.00, diaVence: 28, frecuencia: 30 }
+    // 1. CARGAR DATOS INICIALES O DE LOCALSTORAGE
+    let servicios = JSON.parse(localStorage.getItem('servicios_jimmy')) || [
+        { id: Date.now(), nombre: "GAS", monto: 45.00, diaVence: 26 },
+        { id: Date.now()+1, nombre: "LUZ", monto: 83.30, diaVence: 19 },
+        { id: Date.now()+2, nombre: "CEL JIMMY", monto: 34.95, diaVence: 22 },
+        { id: Date.now()+3, nombre: "FONDEZURCO", monto: 189.80, diaVence: 16 }
     ];
 
-    let mesActual = new Date().getMonth();
-    let pagosRealizados = {}; // Para guardar qué se pagó en cada mes
+    let pagosRealizados = JSON.parse(localStorage.getItem('pagos_jimmy')) || {};
+    let fechaNavegacion = new Date(); // Mes actual
 
     function render() {
         const listado = document.getElementById('lista-servicios');
         listado.innerHTML = '';
         let sumaRestante = 0;
         let todosPagados = true;
+        
+        const hoy = new Date();
+        const mesKey = `${fechaNavegacion.getMonth()}-${fechaNavegacion.getFullYear()}`;
 
-        const hoy = new Date().getDate();
+        // Ordenar por día de vencimiento
+        servicios.sort((a, b) => a.diaVence - b.diaVence);
 
         servicios.forEach(s => {
-            const idCompuesto = `${mesActual}-${s.id}`;
+            const idCompuesto = `${mesKey}-${s.id}`;
             const estaPagado = pagosRealizados[idCompuesto] || false;
             
             if (!estaPagado) {
-                sumaRestante += s.monto;
+                sumaRestante += parseFloat(s.monto);
                 todosPagados = false;
             }
 
-            // Cálculo de días faltantes y barra
-            const diasFaltan = s.diaVence - hoy;
-            let porcentaje = 100 - (diasFaltan * 10); // Simulación de barra
+            const diasFaltan = s.diaVence - hoy.getDate();
+            let porcentaje = 100 - (diasFaltan * 7);
             porcentaje = Math.min(Math.max(porcentaje, 5), 100);
-            const colorBarra = diasFaltan <= 3 ? 'urgente' : '';
 
             listado.innerHTML += `
                 <div class="pago-card ${estaPagado ? 'pagado' : ''}">
@@ -125,20 +122,22 @@
                         <div class="info-txt">
                             <span class="nombre">${s.nombre}</span>
                             <span class="fecha-guia">
-                                ${estaPagado ? '✅ Pagado' : `Faltan ${diasFaltan > 0 ? diasFaltan : 0} días para el pago`}
+                                ${estaPagado ? '✅ Pagado' : `Vence el día ${s.diaVence} (${diasFaltan > 0 ? 'Faltan '+diasFaltan+' días' : 'Vence hoy o ya venció'})`}
                             </span>
                         </div>
-                        <div style="text-align: right; margin-right: 15px;">
-                            <b style="display:block">S/ ${s.monto.toFixed(2)}</b>
+                        <div class="btn-group">
+                            <div style="text-align: right">
+                                <b style="display:block">S/ ${parseFloat(s.monto).toFixed(2)}</b>
+                                <button class="btn-del" onclick="eliminarServicio(${s.id})">eliminar</button>
+                            </div>
+                            <button class="btn-check ${estaPagado ? 'activo' : ''}" onclick="togglePago('${idCompuesto}')">
+                                ${estaPagado ? '✓' : ''}
+                            </button>
                         </div>
-                        <button class="btn-check ${estaPagado ? 'activo' : ''}" 
-                                onclick="marcarPago('${idCompuesto}')">
-                            ${estaPagado ? '✓' : ''}
-                        </button>
                     </div>
                     ${!estaPagado ? `
                         <div class="progreso-container">
-                            <div class="progreso-bar ${colorBarra}" style="width: ${porcentaje}%"></div>
+                            <div class="progreso-bar ${diasFaltan <= 3 ? 'urgente' : ''}" style="width: ${porcentaje}%"></div>
                         </div>
                     ` : ''}
                 </div>
@@ -146,23 +145,45 @@
         });
 
         document.getElementById('total-restante').innerText = `S/ ${sumaRestante.toFixed(2)}`;
+        document.getElementById('mensaje-exito').style.display = (todosPagados && servicios.length > 0) ? 'block' : 'none';
         
-        // Mensaje positivo si todo está en cero
-        const msg = document.getElementById('mensaje-exito');
-        msg.style.display = (todosPagados && servicios.length > 0) ? 'block' : 'none';
+        // Guardar en memoria del navegador
+        localStorage.setItem('servicios_jimmy', JSON.stringify(servicios));
+        localStorage.setItem('pagos_jimmy', JSON.stringify(pagosRealizados));
     }
 
-    function marcarPago(id) {
-        pagosRealizados[id] = !pagosRealizados[id];
+    // Funciones de Gestión
+    function agregarServicio() {
+        const nom = document.getElementById('new-nombre').value;
+        const mon = document.getElementById('new-monto').value;
+        const dia = document.getElementById('new-dia').value;
+
+        if(nom && mon && dia) {
+            servicios.push({ id: Date.now(), nombre: nom.toUpperCase(), monto: parseFloat(mon), diaVence: parseInt(dia) });
+            render();
+            // Limpiar campos
+            document.getElementById('new-nombre').value = '';
+            document.getElementById('new-monto').value = '';
+            document.getElementById('new-dia').value = '';
+        } else { alert("Por favor completa todos los datos"); }
+    }
+
+    function eliminarServicio(id) {
+        if(confirm("¿Eliminar este servicio de la lista permanente?")) {
+            servicios = servicios.filter(s => s.id !== id);
+            render();
+        }
+    }
+
+    function togglePago(idCompuesto) {
+        pagosRealizados[idCompuesto] = !pagosRealizados[idCompuesto];
         render();
     }
 
     function cambiarMes(dir) {
-        mesActual += dir;
-        const fechaTemp = new Date();
-        fechaTemp.setMonth(mesActual);
+        fechaNavegacion.setMonth(fechaNavegacion.getMonth() + dir);
         const nombresMeses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
-        document.getElementById('label-mes').innerText = `${nombresMeses[fechaTemp.getMonth()]} ${fechaTemp.getFullYear()}`;
+        document.getElementById('label-mes').innerText = `${nombresMeses[fechaNavegacion.getMonth()]} ${fechaNavegacion.getFullYear()}`;
         render();
     }
 
